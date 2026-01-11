@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './posts/comments/comments.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { CommentsModule } from './posts/comments/comments.module';
           }
         ]
       }
-    ])],
+    ]),
+    AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
