@@ -10,21 +10,26 @@ import {
   Request,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
-import { Prisma } from 'generated/prisma/client';
+import { Prisma, Post as TPost } from 'generated/prisma/client';
+import { Role } from 'src/enums/role.enum';
 
 import type { IPostSearchParams } from './posts.service';
 import type { IUserRequest } from 'src/auth/jwt.guard';
+import type { CreatePostDto } from './dto/create-post.dto';
+import type { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller()
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(private readonly postsService: PostsService) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() postInput: Prisma.PostCreateInput, @Request() request: IUserRequest) {
-    return this.postsService.createUserPost(request.user.id, postInput);
+  async create(
+    @Body() body: Prisma.PostCreateInput,
+    @Request() request: IUserRequest
+  ): Promise<TPost> {
+    return await this.postsService.createUserPost(request.user.id, body);
   }
 
   @Get()
@@ -39,13 +44,24 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() postInput: Prisma.PostUpdateInput, @Request() request: IUserRequest) {
-    return this.postsService.update(+id, request.user.id, postInput);
+  async update(
+    @Param('id') id: string,
+    @Body() body: UpdatePostDto,
+    @Request() request: IUserRequest
+  ): Promise<TPost> {
+    return await this.postsService.update(+id, request.user.id, body);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Request() request: IUserRequest) {
-    return this.postsService.remove(request.user.id, +id);
+  async remove(@Param('id') id: string, @Request() request: IUserRequest): Promise<void> {
+    const { role } = request.user
+    var userId: number | undefined
+
+    if (role.toLowerCase() !== Role.Admin.toLowerCase()) {
+      userId = request.user.id
+    }
+
+    return await this.postsService.remove(userId, +id);
   }
 }

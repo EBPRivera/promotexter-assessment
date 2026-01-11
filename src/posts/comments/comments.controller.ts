@@ -10,8 +10,9 @@ import {
   Request
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { Prisma } from 'generated/prisma/client';
+import { Prisma, Comment } from 'generated/prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { Role } from 'src/enums/role.enum';
 
 import type { IUserRequest } from 'src/auth/jwt.guard';
 
@@ -23,10 +24,10 @@ export class CommentsController {
   @Post()
   createPostComment(
     @Param('post_id') postId: string,
-    @Body() commentInput: Prisma.CommentCreateInput,
+    @Body() body: Prisma.CommentCreateInput,
     @Request() request: IUserRequest
   ) {
-    return this.commentsService.createPostComment(+postId, request.user.id, commentInput);
+    return this.commentsService.createPostComment(+postId, request.user.id, body);
   }
 
   @Get()
@@ -41,17 +42,24 @@ export class CommentsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':comment_id')
-  update(
-    @Param('comment_id') id: string,
-    @Body() updateInput: Prisma.CommentUpdateInput,
+  async update(
+    @Param('comment_id') commentId: string,
+    @Body() body: Prisma.CommentUpdateInput,
     @Request() request: IUserRequest
-  ) {
-    return this.commentsService.update(+id, request.user.id, updateInput);
+  ): Promise<Comment> {
+    return await this.commentsService.update(+commentId, request.user.id, body);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':comment_id')
-  remove(@Param('comment_id') id: string, @Request() request: IUserRequest) {
-    return this.commentsService.remove(+id, request.user.id);
+  async remove(@Param('comment_id') commentId: string, @Request() request: IUserRequest): Promise<void> {
+    const { role } = request.user
+    var userId: number | undefined
+     
+    if (role.toLowerCase() !== Role.Admin.toLowerCase()) {
+      userId = request.user.id
+    }
+    
+    await this.commentsService.remove(+commentId, userId);
   }
 }

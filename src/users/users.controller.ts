@@ -1,15 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Request
+} from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { User, Prisma } from 'generated/prisma/client';
+import { Role } from 'src/enums/role.enum';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { UseGuards } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
+
+import type { IUserRequest } from 'src/auth/jwt.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() userInput: Prisma.UserCreateInput) {
+  create(@Body() userInput: Prisma.UserCreateInput, @Request() request: IUserRequest) {
+    const { role } = request.user
+
+    if (role.toLowerCase() !== Role.Admin.toLowerCase()) {
+      throw new ForbiddenException()
+    }
+
     return this.usersService.create(userInput);
   }
 
@@ -28,8 +48,15 @@ export class UsersController {
     return this.usersService.update(+id, userInput);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string, @Request() request: IUserRequest) {
+    const { role } = request.user
+
+    if (role.toLowerCase() !== Role.Admin.toLowerCase()) {
+      throw new ForbiddenException()
+    }
+
     return this.usersService.remove(+id);
   }
 }
