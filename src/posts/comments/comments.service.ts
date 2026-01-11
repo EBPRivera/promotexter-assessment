@@ -10,12 +10,22 @@ export interface ICommentSearchParams {
 export class CommentsService {
   constructor(private prisma: PrismaService) { }
 
-  async createPostComment(postId: number, userId: number, commentInput: Prisma.CommentCreateInput): Promise<void> {
+  async createPostComment(postId: number, userId: number, commentInput: Prisma.CommentCreateInput): Promise<Comment> {
     try {
+      const comment = await this.prisma.comment.create({ data: commentInput })
+
+      // Link to post and user
+      const connectQuery = { connect: { id: comment.id } }
       await this.prisma.post.update({
-        where: { id: postId, userId },
-        data: { comments: { create: commentInput } }
+        where: { id: postId },
+        data: { comments: connectQuery }
       })
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { comments: connectQuery}
+      })
+
+      return comment
     } catch {
       throw new BadRequestException()
     }
@@ -31,13 +41,21 @@ export class CommentsService {
   }
 
   async update(id: number, userId: number, data: Prisma.CommentUpdateInput): Promise<Comment> {
-    return await this.prisma.comment.update({
-      where: { id, userId },
-      data
-    })
+    try {
+      return await this.prisma.comment.update({
+        where: { id, userId },
+        data
+      })
+    } catch {
+      throw new BadRequestException()
+    }
   }
 
-  async remove(id: number, userId: number): Promise<void> {
-    this.prisma.comment.delete({ where: { id, userId } })
+  async remove(id: number, userId: number | undefined): Promise<void> {
+    try { 
+      await this.prisma.comment.delete({ where: { id, userId } })
+    } catch {
+      throw new BadRequestException()
+    }
   }
 }

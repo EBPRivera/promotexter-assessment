@@ -45,7 +45,7 @@ export class PostsService {
     }
   }
 
-  async remove(userId: number, id: number): Promise<void> {
+  async remove(userId: number | undefined, id: number): Promise<void> {
     try {
       await this.prisma.post.delete({ where: { id, userId } })
     } catch {
