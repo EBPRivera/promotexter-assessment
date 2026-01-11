@@ -16,8 +16,6 @@ import { Role } from 'src/enums/role.enum';
 
 import type { IPostSearchParams } from './posts.service';
 import type { IUserRequest } from 'src/auth/jwt.guard';
-import type { CreatePostDto } from './dto/create-post.dto';
-import type { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller()
 export class PostsController {
@@ -46,7 +44,7 @@ export class PostsController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body() body: UpdatePostDto,
+    @Body() body: Prisma.PostUpdateInput,
     @Request() request: IUserRequest
   ): Promise<TPost> {
     return await this.postsService.update(+id, request.user.id, body);
