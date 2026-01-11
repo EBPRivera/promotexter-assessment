@@ -15,7 +15,7 @@ import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { UseGuards } from '@nestjs/common';
 import { ForbiddenException } from '@nestjs/common';
 
-import type { IUserRequest } from 'src/auth/jwt.guard';
+import type { IUserRequest } from '../interfaces/user-request';
 
 @Controller('users')
 export class UsersController {

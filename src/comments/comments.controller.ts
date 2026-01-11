@@ -14,7 +14,7 @@ import { Prisma, Comment } from 'generated/prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { Role } from 'src/enums/role.enum';
 
-import type { IUserRequest } from 'src/auth/jwt.guard';
+import type { IUserRequest } from '../interfaces/user-request';
 
 @Controller()
 export class CommentsController {

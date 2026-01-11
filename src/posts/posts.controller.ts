@@ -15,7 +15,7 @@ import { Prisma, Post as TPost } from 'generated/prisma/client';
 import { Role } from 'src/enums/role.enum';
 
 import type { IPostSearchParams } from './posts.service';
-import type { IUserRequest } from 'src/auth/jwt.guard';
+import type { IUserRequest } from '../interfaces/user-request';
 
 @Controller()
 export class PostsController {
