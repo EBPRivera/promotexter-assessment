@@ -5,7 +5,6 @@ import 'dotenv/config';
 import { SignUpDto } from './dto/sign-up.dto';
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from 'src/users/users.service';
-import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -39,15 +38,6 @@ export class AuthService {
       throw new BadRequestException("Password and confirm password does not match")
     }
 
-    // Generate hashed password
-    const salt = await genSalt()
-    const hashedPassword = await hash(password, salt)
-
-    // Save new user
-    const newUser: Prisma.UserCreateInput = {
-      username,
-      password: hashedPassword
-    }
-    this.usersService.create(newUser)
+    this.usersService.create({ username, password })
   }
 }
