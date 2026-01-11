@@ -2,6 +2,11 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { User } from 'generated/prisma/client';
+
+export interface IUserRequest extends Request {
+  user: User
+}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -19,11 +24,11 @@ export class JwtAuthGuard implements CanActivate {
     }
     
     try {
-      const payload = this.jwtService.verify(token);
+      const payload = await this.jwtService.verifyAsync(token);
       
       // Find the user in the database
       const user = await this.prisma.user.findUnique({
-        where: { id: payload.userId },
+        where: { id: payload.sub },
         select: { id: true, username: true }
       });
       
@@ -34,7 +39,7 @@ export class JwtAuthGuard implements CanActivate {
       // Attach user to request object
       request.user = user;
       return true;
-    } catch {
+    } catch (error) {
       throw new UnauthorizedException();
     }
   }

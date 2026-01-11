@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Post, Prisma } from 'generated/prisma/client';
 
@@ -15,23 +14,42 @@ export interface IPostSearchParams {
 export class PostsService {
   constructor(private prisma: PrismaService) { }
 
-  async create(data: Prisma.PostCreateInput): Promise<Post> {
-    return this.prisma.post.create({ data })
+  async createUserPost(userId: number, data: Prisma.PostCreateInput): Promise<Post> {
+    // Create Post
+    const post = await this.prisma.post.create({ data })
+
+    // Associate Post to User
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        posts: { connect: { id: post.id } }
+      }
+    })
+
+    return post
   }
 
   async findAll(params: IPostSearchParams): Promise<Post[]> {
-    return this.prisma.post.findMany(params)
+    return await this.prisma.post.findMany(params)
   }
 
   async findOne(id: number): Promise<Post> {
-    return this.prisma.post.findFirstOrThrow({ where: { id } })
+    return await this.prisma.post.findFirstOrThrow({ where: { id } })
   }
 
-  async update(id: number, data: Prisma.PostUpdateInput): Promise<Post> {
-    return this.prisma.post.update({ where: { id }, data })
+  async update(id: number, userId: number, data: Prisma.PostUpdateInput): Promise<Post> {
+    try {
+      return await this.prisma.post.update({ where: { id, userId }, data })
+    } catch {
+      throw new BadRequestException()
+    }
   }
 
-  async remove(id: number): Promise<void> {
-    this.prisma.post.delete({ where: { id } })
+  async remove(userId: number, id: number): Promise<void> {
+    try {
+      await this.prisma.post.delete({ where: { id, userId } })
+    } catch {
+      throw new BadRequestException()
+    }
   }
 }

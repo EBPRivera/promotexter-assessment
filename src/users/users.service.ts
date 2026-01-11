@@ -16,9 +16,13 @@ export class UsersService {
 
   async findOne(id: number): Promise<User> {
     return this.prisma.user.findFirstOrThrow({
-      where: {
-        id
-      }
+      where: { id }
+    })
+  }
+
+  async findByUsername(username: string) {
+    return this.prisma.user.findFirstOrThrow({
+      where: { username }
     })
   }
 
@@ -30,6 +34,6 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.prisma.user.delete({ where: { id }})
+    await this.prisma.user.delete({ where: { id } })
   }
 }
