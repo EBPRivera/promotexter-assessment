@@ -17,6 +17,10 @@ export class AuthService {
     const { username, password } = loginInput
     const user = await this.usersService.findByUsername(username)
 
+    if (!user) {
+      throw new UnauthorizedException("User with that username does not exist")
+    }
+
     // Compare password
     const passwordCheckResult = await compare(password, user.password)
     if (!passwordCheckResult) {

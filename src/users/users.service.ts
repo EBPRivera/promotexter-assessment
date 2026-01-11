@@ -27,14 +27,14 @@ export class UsersService {
     return this.prisma.user.findMany()
   }
 
-  async findOne(id: number): Promise<User> {
-    return this.prisma.user.findFirstOrThrow({
+  async findOne(id: number): Promise<User | null> {
+    return this.prisma.user.findFirst({
       where: { id }
     })
   }
 
-  async findByUsername(username: string): Promise<User> {
-    return await this.prisma.user.findFirstOrThrow({
+  async findByUsername(username: string): Promise<User | null> {
+    return await this.prisma.user.findFirst({
       where: { username }
     })
   }

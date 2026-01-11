@@ -36,8 +36,8 @@ export class CommentsService {
     return this.prisma.comment.findMany(params)
   }
 
-  async findOne(id: number): Promise<Comment> {
-    return this.prisma.comment.findUniqueOrThrow({ where: { id } })
+  async findOne(id: number): Promise<Comment | null> {
+    return this.prisma.comment.findFirst({ where: { id } })
   }
 
   async update(id: number, userId: number, data: Prisma.CommentUpdateInput): Promise<Comment> {

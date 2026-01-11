@@ -33,8 +33,8 @@ export class PostsService {
     return await this.prisma.post.findMany(params)
   }
 
-  async findOne(id: number): Promise<Post> {
-    return await this.prisma.post.findFirstOrThrow({ where: { id } })
+  async findOne(id: number): Promise<Post | null> {
+    return await this.prisma.post.findFirst({ where: { id } })
   }
 
   async update(id: number, userId: number, data: Prisma.PostUpdateInput): Promise<Post> {
