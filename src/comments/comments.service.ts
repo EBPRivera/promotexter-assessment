@@ -1,6 +1,6 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { Prisma, Comment } from 'generated/prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Prisma, Comment } from '../../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 export interface ICommentSearchParams {
   where?: Prisma.CommentWhereInput
@@ -36,8 +36,8 @@ export class CommentsService {
     return this.prisma.comment.findMany(params)
   }
 
-  async findOne(id: number): Promise<Comment> {
-    return this.prisma.comment.findUniqueOrThrow({ where: { id } })
+  async findOne(id: number): Promise<Comment | null> {
+    return this.prisma.comment.findFirst({ where: { id } })
   }
 
   async update(id: number, userId: number, data: Prisma.CommentUpdateInput): Promise<Comment> {
@@ -47,7 +47,7 @@ export class CommentsService {
         data
       })
     } catch {
-      throw new BadRequestException()
+      throw new NotFoundException()
     }
   }
 
@@ -55,7 +55,7 @@ export class CommentsService {
     try { 
       await this.prisma.comment.delete({ where: { id, userId } })
     } catch {
-      throw new BadRequestException()
+      throw new NotFoundException()
     }
   }
 }

@@ -1,6 +1,6 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Post, Prisma } from 'generated/prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { Post, Prisma } from '../../generated/prisma/client';
 
 export interface IPostSearchParams {
   skip?: number;
@@ -33,15 +33,15 @@ export class PostsService {
     return await this.prisma.post.findMany(params)
   }
 
-  async findOne(id: number): Promise<Post> {
-    return await this.prisma.post.findFirstOrThrow({ where: { id } })
+  async findOne(id: number): Promise<Post | null> {
+    return await this.prisma.post.findFirst({ where: { id } })
   }
 
   async update(id: number, userId: number, data: Prisma.PostUpdateInput): Promise<Post> {
     try {
       return await this.prisma.post.update({ where: { id, userId }, data })
     } catch {
-      throw new BadRequestException()
+      throw new NotFoundException()
     }
   }
 
@@ -49,7 +49,7 @@ export class PostsService {
     try {
       await this.prisma.post.delete({ where: { id, userId } })
     } catch {
-      throw new BadRequestException()
+      throw new NotFoundException()
     }
   }
 }
