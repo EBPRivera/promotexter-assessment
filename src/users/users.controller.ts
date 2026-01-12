@@ -35,12 +35,14 @@ export class UsersController {
   }
 
   @Get()
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<Prisma.UserGetPayload<{ omit: { password: true } }>[]> {
     return await this.usersService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User | null> {
+  async findOne(
+    @Param('id') id: string
+  ): Promise<Prisma.UserGetPayload<{ omit: { password: true }, where: { id: number } }> | null> {
     return await this.usersService.findOne(+id);
   }
 
