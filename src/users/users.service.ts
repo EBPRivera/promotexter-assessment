@@ -23,12 +23,19 @@ export class UsersService {
     return this.prisma.user.create({ data: newUser })
   }
 
-  async findAll(): Promise<User[]> {
-    return this.prisma.user.findMany()
+  async findAll(): Promise<Prisma.UserGetPayload<{ omit: { password: true } }>[]> {
+    return this.prisma.user.findMany({
+      omit: {
+        password: true
+      }
+    })
   }
 
-  async findOne(id: number): Promise<User | null> {
+  async findOne(id: number): Promise<Prisma.UserGetPayload<{ omit: { password: true }, where: { id: number } }> | null> {
     return this.prisma.user.findFirst({
+      omit: {
+        password: true
+      },
       where: { id }
     })
   }
