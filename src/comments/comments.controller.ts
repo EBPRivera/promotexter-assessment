@@ -10,9 +10,9 @@ import {
   Request
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { Prisma, Comment } from 'generated/prisma/client';
-import { JwtAuthGuard } from 'src/auth/jwt.guard';
-import { Role } from 'src/enums/role.enum';
+import { Prisma, Comment } from '../../generated/prisma/client';
+import { JwtAuthGuard } from '../auth/jwt.guard';
+import { Role } from '../enums/role.enum';
 
 import type { IUserRequest } from '../interfaces/user-request';
 

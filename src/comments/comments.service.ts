@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Prisma, Comment } from 'generated/prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma, Comment } from '../../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 export interface ICommentSearchParams {
   where?: Prisma.CommentWhereInput
