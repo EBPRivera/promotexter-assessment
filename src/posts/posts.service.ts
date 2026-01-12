@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Post, Prisma } from '../../generated/prisma/client';
 
@@ -41,7 +41,7 @@ export class PostsService {
     try {
       return await this.prisma.post.update({ where: { id, userId }, data })
     } catch {
-      throw new BadRequestException()
+      throw new NotFoundException()
     }
   }
 
@@ -49,7 +49,7 @@ export class PostsService {
     try {
       await this.prisma.post.delete({ where: { id, userId } })
     } catch {
-      throw new BadRequestException()
+      throw new NotFoundException()
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Prisma, Comment } from '../../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -47,7 +47,7 @@ export class CommentsService {
         data
       })
     } catch {
-      throw new BadRequestException()
+      throw new NotFoundException()
     }
   }
 
@@ -55,7 +55,7 @@ export class CommentsService {
     try { 
       await this.prisma.comment.delete({ where: { id, userId } })
     } catch {
-      throw new BadRequestException()
+      throw new NotFoundException()
     }
   }
 }

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { CommentsService } from './comments.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -77,9 +77,9 @@ describe('CommentsService', () => {
       expect(service.update(1, 1, comments[0])).resolves.toEqual(comments[0])
     })
 
-    it('should throw a BadRequestException if comment does not exist', async () => {
+    it('should throw a NotFoundException if comment does not exist', async () => {
       prismaMock.comment.update.mockImplementationOnce(() => { throw new Error() })
-      await expect(service.update(1, 1, comments[0])).rejects.toThrow(BadRequestException)
+      await expect(service.update(1, 1, comments[0])).rejects.toThrow(NotFoundException)
     })
   })
 
@@ -90,9 +90,9 @@ describe('CommentsService', () => {
       expect(prismaMock.comment.delete).toHaveBeenCalledTimes(1)
     })
 
-    it('should throw a BadRequestException if comment does not exist', async () => {
+    it('should throw a NotFoundException if comment does not exist', async () => {
       prismaMock.comment.delete.mockImplementationOnce(() => { throw new Error() })
-      await expect(service.remove(1, 1)).rejects.toThrow(BadRequestException)
+      await expect(service.remove(1, 1)).rejects.toThrow(NotFoundException)
     })
   })
 
