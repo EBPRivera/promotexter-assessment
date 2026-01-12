@@ -1,10 +1,10 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { hash, genSalt, compare } from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
 import 'dotenv/config';
 import { SignUpDto } from './dto/sign-up.dto';
 import { LoginDto } from './dto/login.dto';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -13,12 +13,12 @@ export class AuthService {
     private jwtService: JwtService
   ) { }
 
-  async signIn(loginInput: LoginDto): Promise<{ access_token }> {
+  async signIn(loginInput: LoginDto): Promise<{ access_token: string }> {
     const { username, password } = loginInput
     const user = await this.usersService.findByUsername(username)
 
     if (!user) {
-      throw new UnauthorizedException("User with that username does not exist")
+      throw new NotFoundException("User with that username does not exist")
     }
 
     // Compare password
